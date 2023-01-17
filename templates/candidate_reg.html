@@ -1,0 +1,53 @@
+{% extends 'master.html' %}
+
+{% block title %}
+    
+{% endblock %}
+<link href="mselect/chosen.min.css" rel="stylesheet">
+<script src="mselect/jquery-3.6.3.min.js"></script>
+<script src="mselect/chosen.jquery.min.js"></script>
+
+{% block body_block %}
+    <center>
+        <div  id="r"  class="row">
+            <h3 id ="heading">Candidate Registration</h3>
+            <form id=form action="#" method="POST">
+                {% csrf_token %}
+                {% load static %}
+                {% for message in messages %}
+                <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+                    <strong>Message : </strong>{{message}}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+                {{form.non_field_errors}}
+                {% for field in form %}
+                <div>
+                    {{ field.label_tag }}  <span class="errorlist">{{field.errors|striptags}}</span> <br>
+                    {{ field }}
+
+                </div>
+                {% endfor %}
+                
+                <a href="http://localhost:8000/candidate_registration/"><button id="button">Submit</button></a>
+                <!-- <select name="skills" id="#id_skills" multiple>
+                    <option>python</option>
+                    <option>java</option>
+                    <option>JavaScript</option>
+                    <option>php</option>
+                </select> -->
+            </form>
+        </div>
+    </center>
+    <script src="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag/dist/js/multi-select-tag.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag/dist/css/multi-select-tag.css">
+    <!-- <script>
+        new MultiSelectTag('id_skills')
+    </script> -->
+    <!-- <script>
+        $(document).ready(function(){
+            $('#id_skills').select2();
+        });
+    </script> -->
+
+{% endblock %}

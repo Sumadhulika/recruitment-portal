@@ -1,0 +1,56 @@
+{% extends 'master.html' %}
+
+{% block title %}
+    
+{% endblock %}
+
+{% block header_block %}
+      
+{% endblock %}
+
+{% block body_block %}
+
+<center>
+    <div  id="r1"  class="row">
+        <h3 id ="heading">Login</h3>
+        <form action="#" method="POST">
+            {% csrf_token %}
+            {% load static %}
+            {% for message in messages %}
+                <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+                    <strong>Message : </strong>{{message}}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            <table>
+                <tr>
+                  
+                    <td align="right"><h5>Email : </h5></td>
+                    <td><input type="email"  name="email"placeholder="Enter your mail "></td>
+                </tr>
+                <tr>
+                    <td align="right"><h5>password : </h5></td>
+                    <td><input type="password" name="password" placeholder="Enter your password "></td>
+                </tr>
+            </table>
+            <a href="http://localhost:8000/login/"><button id ="button3" >Login</button></a>
+        </form>
+
+    </div>
+
+
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
