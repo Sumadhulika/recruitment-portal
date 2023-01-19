@@ -117,7 +117,8 @@ def dataJson(request):
     today = date.today()
     for candidate in cd:
         difference_in_years = today.year - candidate.date.year
-        print(difference_in_years)
+        candidate.experience = difference_in_years
+        candidate.save()
     print(candidateDetails)
     data = {
     'data': list(candidateDetails),
