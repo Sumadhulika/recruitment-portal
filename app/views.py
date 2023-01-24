@@ -61,7 +61,6 @@ def login(request):
 
 
 #-----------------method for Adding candidates------------------------------------
-
 def candidate_registration(request):
     username = request.session.get('username')
     accesslable = request.session.get('accesslable')
@@ -131,7 +130,6 @@ def json_date_handler(obj):
 #-----------------method for sending data in json formate to datatables----------------------------------
 def dataJson(request):
     try:
-        
         candidateDetails = CandidateDetails.objects.all().values()
         cd=CandidateDetails.objects.all()
         today = date.today()
