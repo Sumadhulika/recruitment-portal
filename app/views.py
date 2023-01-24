@@ -26,32 +26,22 @@ logger = logging.getLogger(__name__)
 
 # -----------------method to perform login action----------------------------------
 def login(request):
-    global m,cursor,d
     if request.method=="POST":
-        
-        m=sql.connect(host="localhost",user="root",password="Suma@2000",database="recruitment")
-        cursor=m.cursor()
-        email=request.POST['email']
+        email=request.POST['username']
         password=request.POST['password']
-        c= f"select * from app_appuser where email='{email}' and password='{password}'"
-        cursor.execute(c)
-        t=tuple(cursor.fetchall())
-        print(t)
-        if(t):
-            print(t)
-            username=t[0][2]
-            accesslable=t[0][6]
-            request.session['username']=username
-            request.session['accesslable']=accesslable
-            d={'username':username}
-            admin="1"
-            employee="2"
-            if accesslable==admin:
+        all=appuser.objects.filter(email=email)
+        request.session['username']=all[0].username
+        request.session['accesslable']=all[0].accesslable
+        accesslable=all[0].accesslable
+        admin="1"
+        employee="2"
+        if email==all[0].email:
+            if accesslable==admin:                    
                 return redirect ('/adminpage/')
             if accesslable==employee:
                 return redirect ('/employee/')
             else:
-                messages.error(request,"invalid login detail")
+                messages.error(request,"invali login detail")
                 return render (request,'login.html')
         else:
             messages.error(request,"invali login detail")
@@ -65,15 +55,17 @@ def login(request):
 def candidate_registration(request):
     username = request.session.get('username')
     accesslable = request.session.get('accesslable')
-    if request.method=="POST":
+    if request.method=="POST" and request.FILES :
         try:
-            form=candidateform(request.POST)
+            form=candidateform(request.POST,request.FILES)
             if form.is_valid():
                 details=form.save(commit=False)
                 exp=form.cleaned_data['experience']
                 today=datetime.today()
+                resume=form.cleaned_data['resume']
                 expdate=datetime(today.year-exp,today.month,today.day)
                 details.date=expdate
+                details.resume=resume
                 details.save()
                 form.save_m2m()
                 messages.success(request,'Registration Successful')

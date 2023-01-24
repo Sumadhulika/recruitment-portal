@@ -18,6 +18,8 @@ from django.urls import path
 from app.views import login
 from app.views import candidate_registration
 from app.views import home
+from django .conf import settings
+from django.conf.urls.static import static
 from app.views import adminpage
 from app.views import employee
 from app.views import logout
@@ -35,4 +37,14 @@ urlpatterns = [
     path('employee_registration/',employee_registration),
     path('viewcandidate/',viewcandidate),
     path('dataJson/',dataJson,name='dataJson'),
-]
+
+
+
+
+
+
+
+
+
+
+]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

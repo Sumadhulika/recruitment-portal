@@ -1,6 +1,5 @@
 from django import forms
 from app.models import CandidateDetails,appuser,skills,qualifications
-from multiselectfield import MultiSelectField
 # from rest_framework import fields, serializers
 
 
@@ -16,10 +15,10 @@ class candidateform(forms.ModelForm):
     experience=forms.IntegerField(error_messages={'required':'*'},widget=forms.NumberInput(attrs={'class':'input','placeholder':'Enter your experience'}))
     contact=forms.CharField(error_messages={'required':'*'},widget=forms.TextInput(attrs={'class':'input','placeholder':'Enter mobile number'}))
     address=forms.CharField(error_messages={'required':'*'},widget=forms.TextInput(attrs={'class':'input','placeholder':'Enter your address'}))
-
+    resume=forms.FileField()
     class Meta:
         model= CandidateDetails
-        fields=['first_name','last_name','email','qualifications','skills','experience','contact','address']
+        fields=['first_name','last_name','email','qualifications','skills','experience','contact','address','resume']
         error_messages = {
         
             'qualifications' : {

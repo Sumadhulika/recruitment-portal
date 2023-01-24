@@ -41,6 +41,7 @@ class CandidateDetails(models.Model):
     contact=models.CharField(max_length=10)
     address=models.CharField(max_length=100)
     date=models.DateField(null=True)
+    resume=models.FileField(upload_to='resume',null=True)
 
 
 
