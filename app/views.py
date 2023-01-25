@@ -13,7 +13,11 @@ from app.forms import candidateform,registration
 from django_serverside_datatable.views import ServerSideDatatableView
 from django.db.models import F
 from datetime import date
+from django.contrib.auth.hashers import make_password
 from json import dumps
+
+from django.contrib.auth import authenticate, login,logout
+
 from datetime import datetime,date
 from datetime import date, timedelta
 import logging
@@ -25,28 +29,34 @@ from operator import itemgetter
 logger = logging.getLogger(__name__)
 
 # -----------------method to perform login action----------------------------------
-def login(request):
-    if request.method=="POST":
-        email=request.POST['username']
-        password=request.POST['password']
-        all=appuser.objects.filter(email=email)
-        request.session['username']=all[0].username
-        request.session['accesslable']=all[0].accesslable
-        accesslable=all[0].accesslable
-        admin="1"
-        employee="2"
-        if email==all[0].email:
-            if accesslable==admin:                    
-                return redirect ('/adminpage/')
-            if accesslable==employee:
-                return redirect ('/employee/')
+def my_login(request):
+    if request.method == "POST":
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        try:
+            user = CustomUser.objects.get(email=email)
+        except CustomUser.DoesNotExist:
+            messages.error(request, "Invalid email or password")
+            return render(request, 'login.html')
+        if user.check_password(password) and user.is_active:
+            request.session['username'] = user.username
+            request.session['accesslable'] = user.accesslable
+            admin = 1
+            employee = 2
+            if user.accesslable == admin:                    
+                login(request, user)
+                return redirect('/adminpage/')
+            elif user.accesslable == employee:
+                login(request, user)
+                return redirect('/employee/')
             else:
-                messages.error(request,"invali login detail")
-                return render (request,'login.html')
+                messages.error(request, "Invalid login detail")
+                return render(request, 'login.html')
         else:
-            messages.error(request,"invali login detail")
-            return render (request,'login.html')
-    return render(request,'login.html')
+            messages.error(request, "Invalid email or password")
+            return render(request, 'login.html')
+    else:
+        return render(request, 'login.html')
 
 
 
@@ -55,17 +65,15 @@ def login(request):
 def candidate_registration(request):
     username = request.session.get('username')
     accesslable = request.session.get('accesslable')
-    if request.method=="POST" and request.FILES :
+    if request.method=="POST":
         try:
             form=candidateform(request.POST,request.FILES)
-            if form.is_valid():
+            if form.is_valid() and request.FILES.get('resume'):
                 details=form.save(commit=False)
                 exp=form.cleaned_data['experience']
                 today=datetime.today()
-                resume=form.cleaned_data['resume']
                 expdate=datetime(today.year-exp,today.month,today.day)
                 details.date=expdate
-                details.resume=resume
                 details.save()
                 form.save_m2m()
                 messages.success(request,'Registration Successful')
@@ -85,23 +93,28 @@ def employee_registration(request):
     username = request.session.get('username')
     accesslable = request.session.get('accesslable')
 
-    if request.method=="POST":
-        try:
-            form=registration(request.POST)
-            if form.is_valid():
-                form.save()
+    if request.method == "POST":
+        form = registration(request.POST, request.FILES)
+        if form.is_valid():
+            email = form.cleaned_data.get('email')
+            if CustomUser.objects.filter(email=email).exists():
+                messages.error(request,'This email already exists')
+                return render(request,'employee_reg.html',{"form":form,'username':username,'accesslable':accesslable})
+            else:
+                details = form.save(commit=False)
+                password = form.cleaned_data.get('password')
+                details.password = make_password(password)
+                details.is_active = 1
+                details.save()
                 messages.success(request,'Registration Successful')
                 return render (request,'employee_reg.html',{"form":form,'username':username,'accesslable':accesslable})
-        except:
-                messages.error(request,'Registration Unsuccessful')
-                return render (request,'employee_reg.html',{"form":form,'username':username,'accesslable':accesslable})
+        else:
+            messages.error(request,'Form is not valid')
+            return render(request,'employee_reg.html',{"form":form,'username':username,'accesslable':accesslable})
     else:
-        form=registration(request.POST)
-        
-    return render (request,'employee_reg.html',{"form":form,'username':username,'accesslable':accesslable})    
-
-
-
+        form = registration()
+    return render(request,'employee_reg.html',{"form":form,'username':username,'accesslable':accesslable})
+  
 #-----------------method for returning candidate details page----------------------------------
 def viewcandidate(request):
     username = request.session.get('username')
@@ -109,9 +122,6 @@ def viewcandidate(request):
     context={'username':username
         ,'accesslable':accesslable}
     return render(request,'viewcandidate.html',context)
-
-
-
 
 def json_date_handler(obj):
   if isinstance(obj, (datetime, date)):
@@ -183,11 +193,13 @@ def employee(request):
 
 
 # -----------------method to perform logout action-------------------------------
-def logout(request):
+
+def my_logout(request):
+    logout(request)
     try:
-      del request.session['username']
-      del request.session['accesslable']
+        del request.session['username']
+        del request.session['accesslable']
     except:
-      pass
-    messages.error(request,"Loggedout successfully")
-    return redirect ('/home/')
+        pass
+    messages.error(request,"Logged out successfully")
+    return redirect('/home/')

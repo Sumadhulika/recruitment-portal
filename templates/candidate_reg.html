@@ -8,7 +8,7 @@
     <center>
         <div  id="r"  class="row">
             <h3 id ="heading">Candidate Registration</h3>
-            <form id=form action="#" method="POST">
+            <form id=form action="#" method="POST" enctype="multipart/form-data">
 
                 {% csrf_token %}
                 {% load static %}
@@ -37,7 +37,7 @@
     <script src="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag/dist/js/multi-select-tag.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag/dist/css/multi-select-tag.css">
     
-    <script>
+    <script> 
         new MultiSelectTag('id_skills')
     </script>
     
