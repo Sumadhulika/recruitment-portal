@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 from django.contrib.messages import constants as messages
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -139,3 +139,50 @@ MESSAGE_TAGS = {
     50: 'critical',
     messages.ERROR:'danger',
 }
+
+LOGGING = {
+    'version':1,
+    'loggers':{
+        'django': {
+            'handlers':['file'],
+            'level':'INFO',
+        },
+        'django.server': {
+            'handlers': ['null'],
+            'propagate': False,
+            'level': 'INFO',
+        },
+        'django.access': {
+            'handlers': ['null'],
+            'propagate': False,
+            'level': 'INFO',
+        },
+    },
+    'handlers':{
+        'file':{
+            'level':'INFO',
+            'class': 'logging.FileHandler',
+            'filename':'C:/Users/SUMADHULIKA/OneDrive/Desktop/logfiles/recruitment.log',
+            'formatter':'simple',
+        },
+        'null': {
+            'class': 'logging.NullHandler',
+        }
+    },
+    'formatters':{
+        'simple': {
+            'format': '{levelname} {asctime} {module} {funcName} {process:d} {thread:d} {message}',
+            'style': '{',
+        }
+
+    }
+}
+
+
+
+
+
+
+
+
+
