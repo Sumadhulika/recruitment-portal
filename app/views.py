@@ -27,6 +27,7 @@ logger = logging.getLogger('django')
 # -----------------method to perform login action----------------------------------
 def login(request):
     global m,cursor,d
+    logger.info("Logging to recruitmentportal")
     try:
         if request.method=="POST":
             m=sql.connect(host="localhost",user="root",password="Suma@2000",database="recruitment")
@@ -63,6 +64,7 @@ def login(request):
 def candidate_registration(request):
     username = request.session.get('username')
     accesslable = request.session.get('accesslable')
+    logger.info("Adding candidates")
     try:
         if request.method=="POST":
                 form=candidateform(request.POST)
@@ -80,6 +82,7 @@ def candidate_registration(request):
                     return render (request,'candidate_reg.html',{"form":form,'username':username,'accesslable':accesslable})
                 else:
                     messages.error(request,'Registration Unsuccessful')
+                    logger.error("An error occurred while adding the candidate.")
                     return render (request,'candidate_reg.html',{"form":form,'username':username,'accesslable':accesslable})
         else:
             form=candidateform(request.POST)
@@ -92,6 +95,7 @@ def candidate_registration(request):
 def employee_registration(request):
     username = request.session.get('username')
     accesslable = request.session.get('accesslable')
+    logger.info("Adding employees")
     try:
         if request.method=="POST":
                 form=registration(request.POST)
@@ -103,6 +107,7 @@ def employee_registration(request):
                     return render (request,'employee_reg.html',{"form":form,'username':username,'accesslable':accesslable})
                 else:
                     messages.error(request,'Registration Unsuccessful')
+                    logger.error("An error occurred while adding the employee.")
                     return render (request,'employee_reg.html',{"form":form,'username':username,'accesslable':accesslable})
         else:
             form=registration(request.POST)
@@ -116,12 +121,12 @@ def employee_registration(request):
 
 #-----------------method for returning candidate details page----------------------------------
 def viewcandidate(request):
+    logger.info("viewing candidatedetails")
     try:
         username = request.session.get('username')
         accesslable = request.session.get('accesslable')
         context={'username':username
             ,'accesslable':accesslable}
-        logger.info("viewing candidatedetails")
         return render(request,'viewcandidate.html',context)
     except:
         logger.error("An error occurred while veiwing candidatedetails")
