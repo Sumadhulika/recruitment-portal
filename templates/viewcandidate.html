@@ -10,12 +10,18 @@
 	<head>
 		<meta charset="utf-8">
 		<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+		<link rel="stylesheet" type="text/css" href="path/to/your/custom.css">
+		<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+		<script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+		<script src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap5.min.js"></script>	
 	</head>
+
 	<body background="none">
 		<center><h1>Candidate Details</h1></center>
 		<hr>
 		<table id="my_table" border="2" background-color="none">
-			<thead border="2">
+			<thead border="2" align="center">
+				
 				<tr>
 					<th>first_name</th>
                     <th>last_name</th>
@@ -30,12 +36,9 @@
 			<tbody></tbody>
 		</table>
         
-        <!-- columns = ['first_name', 'last_name', 'email','skills','experience','contact','address'] -->
+        
 
-		<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-		<script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
-		<script src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap5.min.js"></script>
-		<!--<script >$(document).ready( function () { $('#data_table').DataTable(); });</script>-->
+		
 		<script>
 			$(document).ready(function() {
 				$('#my_table').DataTable({
@@ -50,11 +53,12 @@
 							{"data": "last_name"},
 							{"data": "email"},
 							{"data": "qualifications_id"},
-							{"data":"skills_id"},
+							{"data":"skills"},
 							{"data":"experience"},
 							{"data":"contact"},
 							{"data":"address"},
 						],
+						
 					});
 					});
 		

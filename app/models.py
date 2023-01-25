@@ -36,7 +36,7 @@ class CandidateDetails(models.Model):
     last_name=models.CharField(max_length=45)
     email=models.EmailField(unique=True)
     qualifications=models.ForeignKey(qualifications,on_delete=models.CASCADE)
-    skills=models.ForeignKey(skills,on_delete=models.CASCADE)
+    skills = models.ManyToManyField(skills)    
     experience=models.IntegerField()
     contact=models.CharField(max_length=10)
     address=models.CharField(max_length=100)
