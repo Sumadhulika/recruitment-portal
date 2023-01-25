@@ -11,21 +11,20 @@
 		<meta charset="utf-8">
 		<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
 	</head>
-	<body>
-		<h1>Items</h1>
+	<body background="none">
+		<center><h1>Candidate Details</h1></center>
 		<hr>
-		<table id="items-table">
-			<thead>
+		<table id="my_table" border="2" background-color="none">
+			<thead border="2">
 				<tr>
-					<th scope="col">First name</th>
-                    <th>Last name</th>
-                    <th> Email </th>
-                    <th>Contact</th>
-                    <th>Skills</th>
-                    <th>Experience</th>
-                    <th>Qualification</th>
-                    <th>Address</th>
-                    <th>Date</th>
+					<th>first_name</th>
+                    <th>last_name</th>
+                    <th>email</th>
+                    <th>qualifications</th>
+                    <th>skills</th>
+                    <th>experience</th>
+                    <th>contact</th>
+                    <th>address</th>
 				</tr>
 			</thead>
 			<tbody></tbody>
@@ -33,24 +32,32 @@
         
         <!-- columns = ['first_name', 'last_name', 'email','skills','experience','contact','address'] -->
 
-		<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-		<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-		<script language="javascript">
-			$(document).ready(function () {
-				$('#items-table').dataTable({
-					serverSide: true,
-					sAjaxSource: "http://localhost:8000/viewcandidate/",  // new url
-                                        columns: [
-                                            {name: 'first_name', data: 0},
-                                            {name: 'last_name', data: 1},
-                                            {name: "email", data: 2},
-                                            {name: 'skills', data: 3},
-                                            {name: 'experience', data: 4},
-                                            {name: "contact", data: 5},
-                                            {name: "address", data: 6},
-                                        ],
-				});
-			});
+		<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+		<script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+		<script src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap5.min.js"></script>
+		<!--<script >$(document).ready( function () { $('#data_table').DataTable(); });</script>-->
+		<script>
+			$(document).ready(function() {
+				$('#my_table').DataTable({
+					"processing": true,
+					"serverSide": false,
+					"ajax": {
+						"url": "{% url 'dataJson' %}",
+						"dataSrc":"data",
+						},
+						"columns": [
+							{"data": "first_name"},
+							{"data": "last_name"},
+							{"data": "email"},
+							{"data": "qualifications_id"},
+							{"data":"skills_id"},
+							{"data":"experience"},
+							{"data":"contact"},
+							{"data":"address"},
+						],
+					});
+					});
+		
 		</script>
 	</body>
 </html>

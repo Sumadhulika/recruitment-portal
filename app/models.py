@@ -43,3 +43,6 @@ class CandidateDetails(models.Model):
     date=models.DateField(null=True)
 
 
+
+
+

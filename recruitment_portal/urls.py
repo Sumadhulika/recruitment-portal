@@ -23,7 +23,7 @@ from app.views import employee
 from app.views import logout
 from app.views import employee_registration
 from app.views import viewcandidate
-
+from app.views import dataJson
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/',login),
@@ -34,4 +34,5 @@ urlpatterns = [
     path('logout/',logout),
     path('employee_registration/',employee_registration),
     path('viewcandidate/',viewcandidate),
+    path('dataJson/',dataJson,name='dataJson'),
 ]
