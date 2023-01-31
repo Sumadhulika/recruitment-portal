@@ -15,24 +15,30 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from app.views import login
+from app.views import my_login
 from app.views import candidate_registration
 from app.views import home
 from app.views import adminpage
 from app.views import employee
-from app.views import logout
+from app.views import my_logout
+from django .conf import settings
+from django.conf.urls.static import static
 from app.views import employee_registration
 from app.views import viewcandidate
 from app.views import dataJson
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('login/',login),
+    path('my_login/',my_login),
     path('candidate_registration/',candidate_registration),
     path('home/',home),
     path('adminpage/',adminpage),
     path('employee/',employee),
-    path('logout/',logout),
+    path('my_logout/',my_logout),
     path('employee_registration/',employee_registration),
     path('viewcandidate/',viewcandidate),
     path('dataJson/',dataJson,name='dataJson'),
-]
+
+
+
+
+]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

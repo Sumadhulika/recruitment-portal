@@ -41,27 +41,54 @@
 		
 		<script>
 			$(document).ready(function() {
-				$('#my_table').DataTable({
-					"processing": true,
-					"serverSide": false,
-					"ajax": {
-						"url": "{% url 'dataJson' %}",
-						"dataSrc":"data",
-						},
-						"columns": [
-							{"data": "first_name"},
-							{"data": "last_name"},
-							{"data": "email"},
-							{"data": "qualifications_id"},
-							{"data":"skills"},
-							{"data":"experience"},
-							{"data":"contact"},
-							{"data":"address"},
-						],
-						
+				var table = $('#my_table').DataTable({
+				  "processing": true,
+				  "serverSide": false,
+				  "ajax": {
+					"url": "{% url 'dataJson' %}",
+					"dataSrc":"data",
+				  },
+				  "columns": [
+					{"data": "first_name"},
+					{"data": "last_name"},
+					{"data": "email"},
+					{"data": "qualifications_id"},
+					{"data":"skills"},
+					{"data":"experience"},
+					{"data":"contact"},
+					{"data":"address"},
+				  ],
+				});
+				
+				// Create a new table row to hold the search inputs
+				var searchRow = $("<tr></tr>");
+				$("#my_table thead").append(searchRow);
+				
+				// Loop through the columns and add a search input for each column
+				$('#my_table thead th').each( function () {
+				  var title = $('#my_table thead th').eq( $(this).index() ).text();
+				  if (title !== "contact" && title !== "address") {  // exclude the "contact" and "address" columns
+					var searchInput = $('<input type="text" placeholder="Search '+title+'" />');
+				
+					// Add the input to the search row
+					var searchTd = $("<td></td>").append(searchInput);
+					searchRow.append(searchTd);
+				
+					// Add an event listener to the input to trigger a search and redraw the table
+					searchInput.on('keyup change', function () {
+					  table
+						.column($(this).parent().index())
+						.search(this.value)
+						.draw();
 					});
-					});
-		
+				  }
+				});
+			  });
+			  
+			  
+			  
+			  
+			  
 		</script>
 	</body>
 </html>

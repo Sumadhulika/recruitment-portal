@@ -5,13 +5,14 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render,redirect
 import mysql.connector as sql
 from django.contrib import messages
-from app.models import *
+from .models import CustomUser,CandidateDetails
 from django.http import JsonResponse
 from django.template import loader
 from datetime import datetime
 from app.forms import candidateform,registration
 from django_serverside_datatable.views import ServerSideDatatableView
 from django.db.models import F
+from django.contrib.auth import authenticate, login,logout
 from datetime import date
 from json import dumps
 from datetime import datetime,date
@@ -20,75 +21,120 @@ import logging
 from django.db.models import Count
 from itertools import groupby
 from operator import itemgetter
+from django.contrib.auth.hashers import make_password
+
 
 
 logger = logging.getLogger('django')
 
 # -----------------method to perform login action----------------------------------
-def login(request):
-    global m,cursor,d
-    logger.info("Logging to recruitmentportal")
+def my_login(request):
     try:
-        if request.method=="POST":
-            m=sql.connect(host="localhost",user="root",password="Suma@2000",database="recruitment")
-            cursor=m.cursor()
-            email=request.POST['email']
-            password=request.POST['password']
-            c= f"select * from app_appuser where email='{email}' and password='{password}'"
-            cursor.execute(c)
-            t=tuple(cursor.fetchall())
+        logger.info("Logging to recruitmentportal")
+        if request.method == "POST":
+            email = request.POST.get('email')
+            password = request.POST.get('password')
+            try:
+                user = CustomUser.objects.get(email=email)
+            except CustomUser.DoesNotExist:
+                messages.error(request, "Invalid email or password")
+                return render(request, 'login.html')
             logger.info("loggingin with email= %s,password=%s",email,password)
-            if(t):
-                username=t[0][2]
-                accesslable=t[0][6]
-                request.session['username']=username
-                request.session['accesslable']=accesslable
-                admin="1"
-                employee="2"
-                if accesslable==admin:
-                    return redirect ('/adminpage/')
-                if accesslable==employee:
-                    return redirect ('/employee/')
+            if user.check_password(password) and user.is_active:
+                auth=authenticate(email=email,password=password)
+                print(auth)
+                request.session['username'] = user.username
+                request.session['accesslable'] = user.accesslable
+                admin=1
+                hr=2
+                if user.accesslable == admin:
+                    if user.password.startswith('pbkdf2_sha256'):
+                        login(request, user)
+
+                    return redirect('/adminpage/')
+                elif user.accesslable == hr:
+                    if user.password.startswith('pbkdf2_sha256'):
+                        login(request, user)
+                    return redirect('/employee/')
                 else:
-                    messages.error(request,"invalid login detail")
-                    return render (request,'login.html')
-            else:
-                messages.error(request,"invali login detail")
-                return render (request,'login.html')
+                    messages.error(request, "Invalid login detail")
+                    return render(request, 'login.html')
         else:
-            return render(request,'login.html')
+            return render(request, 'login.html')
     except:
         logger.error("An error occurred while logging.")
 
 #-----------------method for Adding candidates------------------------------------
+
+# def candidate_registration(request):
+#     username = request.session.get('username')
+#     accesslable = request.session.get('accesslable')
+#     logger.info("Adding candidates")
+#     try:
+#         if request.method == "POST":
+#             form = candidateform(request.POST, request.FILES)
+#             if form.is_valid():
+#                 details = form.save(commit=False)
+#                 d = form.cleaned_data
+#                 exp = form.cleaned_data.get('experience')
+#                 today = datetime.today()
+#                 expdate = datetime(today.year - exp, today.month, today.day)
+#                 details.date = expdate
+#                 details.save()
+#                 form.save_m2m()
+#                 messages.success(request, 'Registration Successful')
+#                 logger.info("adding candidate %s", d)
+#                 form = candidateform()
+#                 return render(request, 'candidate_reg.html', {"form": form, 'username': username, 'accesslable': accesslable})
+#             else:
+#                 form.save()
+#                 messages.warning(request, 'Form validation failed, but the form was still saved.')
+#                 logger.warning("An error occurred while adding the candidate. Form validation failed, but the form was still saved.")
+#                 return render(request, 'candidate_reg.html', {"form": form, 'username': username, 'accesslable': accesslable})
+
+#         else:
+#             form = candidateform()
+#         return render(request, 'candidate_reg.html', {"form": form, 'username': username, 'accesslable': accesslable})
+#     except Exception as e:
+#         logger.error("An error occurred while adding the candidate: %s", str(e))
+#         messages.error(request, 'Registration Unsuccessful')
+#         return render(request, 'candidate_reg.html', {"form": form, 'username': username, 'accesslable': accesslable})
 def candidate_registration(request):
     username = request.session.get('username')
     accesslable = request.session.get('accesslable')
     logger.info("Adding candidates")
     try:
-        if request.method=="POST":
-                form=candidateform(request.POST)
-                if form.is_valid():
-                    details=form.save(commit=False)
-                    d=form.cleaned_data
-                    exp=form.cleaned_data['experience']
-                    today=datetime.today()
-                    expdate=datetime(today.year-exp,today.month,today.day)
-                    details.date=expdate
-                    details.save()
-                    form.save_m2m()
-                    messages.success(request,'Registration Successful')
-                    logger.info("adding candidate  %s",d)
-                    return render (request,'candidate_reg.html',{"form":form,'username':username,'accesslable':accesslable})
-                else:
-                    messages.error(request,'Registration Unsuccessful')
-                    logger.error("An error occurred while adding the candidate.")
-                    return render (request,'candidate_reg.html',{"form":form,'username':username,'accesslable':accesslable})
+        if request.method == "POST":
+            form = candidateform(request.POST, request.FILES)
+            if form.is_valid():
+                details = form.save(commit=False)
+                exp = form.cleaned_data.get('experience')
+                today = datetime.today()
+                expdate = datetime(today.year - exp, today.month, today.day)
+                details.date = expdate
+                details.save()
+                form.save_m2m()
+                messages.success(request, 'Registration Successful')
+                logger.info("Candidate %s added successfully", details)
+                form = candidateform()
+                return render(request, 'candidate_reg.html', {"form": form, 'username': username, 'accesslable': accesslable})
+            else:
+                messages.warning(request, 'Form validation failed. Please check the errors in the form and try again.')
+                logger.warning("An error occurred while adding the candidate. Form validation failed. %s", form.errors)
+                print(form.errors)
+                return render(request, 'candidate_reg.html', {"form": form, 'username': username, 'accesslable': accesslable})
+
         else:
-            form=candidateform(request.POST)
-        return render (request,'candidate_reg.html',{"form":form,'username':username,'accesslable':accesslable}) 
-    except:
-        logger.error("An error occurred while adding the candidate.")
+            form = candidateform()
+        return render(request, 'candidate_reg.html', {"form": form, 'username': username, 'accesslable': accesslable})
+    except Exception as e:
+        logger.error("An error occurred while adding the candidate: %s", str(e))
+        messages.error(request, 'Registration Unsuccessful')
+        return render(request, 'candidate_reg.html', {"form": form, 'username': username, 'accesslable': accesslable}) 
+
+
+
+
 
 
 #-----------------method for Adding Employees-------------------------------------
@@ -97,25 +143,37 @@ def employee_registration(request):
     accesslable = request.session.get('accesslable')
     logger.info("Adding employees")
     try:
-        if request.method=="POST":
-                form=registration(request.POST)
-                if form.is_valid():
-                    d=form.cleaned_data
-                    form.save()
+        if request.method == "POST":
+            form = registration(request.POST)
+            if form.is_valid():
+                d=form.cleaned_data
+                email = form.cleaned_data.get('email')
+                if CustomUser.objects.filter(email=email).exists():
+                    messages.error(request,'This email already exists')
+                    logger.error("This email already exists")
+                    return render(request,'employee_reg.html',{"form":form,'username':username,'accesslable':accesslable})
+                else:
+                    details = form.save(commit=False)
+                    password = form.cleaned_data.get('password')
+                    details.password = make_password(password)
+                    details.is_active = True
+                    details.save()
                     messages.success(request,'Registration Successful')
                     logger.info("adding employee  %s",d)
+                    form = registration()
                     return render (request,'employee_reg.html',{"form":form,'username':username,'accesslable':accesslable})
-                else:
-                    messages.error(request,'Registration Unsuccessful')
-                    logger.error("An error occurred while adding the employee.")
-                    return render (request,'employee_reg.html',{"form":form,'username':username,'accesslable':accesslable})
+            else:
+                messages.error(request,'Registration Unsuccessful')
+                logger.error("An error occurred while adding the employee.")
+                return render(request,'employee_reg.html',{"form":form,'username':username,'accesslable':accesslable})
         else:
-            form=registration(request.POST)
+            form = registration()
         logger.info("adding employee  username = %s and accesslable = %s", username,accesslable)
-        return render (request,'employee_reg.html',{"form":form,'username':username,'accesslable':accesslable})    
+        return render(request,'employee_reg.html',{"form":form,'username':username,'accesslable':accesslable})
     except:
-
         logger.error("An error occurred while adding the employee.")
+        messages.error(request, 'An error occurred while adding the employee')
+        return render(request, 'employee_reg.html', {"form":form,'username':username,'accesslable':accesslable})
 
 
 
@@ -214,7 +272,7 @@ def employee(request):
 
 
 # -----------------method to perform logout action-------------------------------
-def logout(request):
+def my_logout(request):
     try:
       del request.session['username']
       del request.session['accesslable']
