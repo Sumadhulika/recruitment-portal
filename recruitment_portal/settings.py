@@ -15,7 +15,8 @@ from django.contrib.messages import constants as messages
 import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+MEDIA_DIR=os.path.join(BASE_DIR,'media')
+MEDIA_ROOT=MEDIA_DIR
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -39,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app',
-    'multiselectfield',
+    
 ]
 
 MIDDLEWARE = [
@@ -79,11 +80,11 @@ WSGI_APPLICATION = 'recruitment_portal.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'recruitment',
+        'NAME': 'recruitment1',
         'HOST': '127.0.0.1',
         'PORT': '3306',
         'USER': 'root',
-        'PASSWORD': 'Suma@2000',
+        'PASSWORD': 'root',
         'OPTIONS':{
             'init_command':"SET sql_mode='STRICT_TRANS_TABLES'" 
         }
@@ -129,6 +130,7 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
+MEDIA_URL='media/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
@@ -162,7 +164,7 @@ LOGGING = {
         'file':{
             'level':'INFO',
             'class': 'logging.FileHandler',
-            'filename':'C:/Users/SUMADHULIKA/OneDrive/Desktop/logfiles/recruitment.log',
+            'filename':"C:/Users/saich/Desktop/logfiles/recruitment.txt",
             'formatter':'simple',
         },
         'null': {
