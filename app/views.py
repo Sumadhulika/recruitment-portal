@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render,redirect
 import mysql.connector as sql
 from django.contrib import messages
-from app.models import *
+from .models import CustomUser,CandidateDetails
 from django.http import JsonResponse
 from django.template import loader
 from datetime import datetime
@@ -21,6 +21,8 @@ import logging
 from django.db.models import Count
 from itertools import groupby
 from operator import itemgetter
+from django.contrib.auth.hashers import make_password
+
 
 
 logger = logging.getLogger('django')
@@ -63,37 +65,74 @@ def my_login(request):
         logger.error("An error occurred while logging.")
 
 #-----------------method for Adding candidates------------------------------------
+# def candidate_registration(request):
+#     username = request.session.get('username')
+#     accesslable = request.session.get('accesslable')
+#     logger.info("Adding candidates")
+#     try:
+#         if request.method=="POST" and request.FILES:
+#             try:
+#                 form=candidateform(request.POST,request.FILES)
+#                 if form.is_valid():
+#                     details=form.save(commit=False)
+#                     d=form.cleaned_data
+#                     exp=form.cleaned_data.get('experience')
+#                     resume=form.cleaned_data.get('resume')
+#                     today=datetime.today()
+#                     expdate=datetime(today.year-exp,today.month,today.day)
+#                     details.date=expdate
+#                     details.resume=resume
+#                     details.save()
+#                     form.save_m2m()
+#                     messages.success(request,'Registration Successful')
+#                     logger.info("adding candidate  %s",d)
+#                     form = candidateform()
+#                     return render (request,'candidate_reg.html',{"form":form,'username':username,'accesslable':accesslable})
+#             except:
+#                 messages.error(request,'Registration Unsuccessful')
+#                 logger.error("An error occurred while adding the candidate.")
+#                 return render (request,'candidate_reg.html',{"form":form,'username':username,'accesslable':accesslable})
+
+#         else:
+#             form=candidateform(request.POST)
+#         return render (request,'candidate_reg.html',{"form":form,'username':username,'accesslable':accesslable}) 
+#     except:
+#         logger.error("An error occurred while adding the candidate.")
+
 def candidate_registration(request):
     username = request.session.get('username')
     accesslable = request.session.get('accesslable')
     logger.info("Adding candidates")
     try:
-        if request.method=="POST":
-            try:
-                form=candidateform(request.POST,request.FILES)
-                if form.is_valid() and request.FILES.get('resume'):
-                    details=form.save(commit=False)
-                    d=form.cleaned_data
-                    exp=form.cleaned_data['experience']
-                    today=datetime.today()
-                    expdate=datetime(today.year-exp,today.month,today.day)
-                    details.date=expdate
-                    details.save()
-                    form.save_m2m()
-                    messages.success(request,'Registration Successful')
-                    logger.info("adding candidate  %s",d)
-                    form = candidateform()
-                    return render (request,'candidate_reg.html',{"form":form,'username':username,'accesslable':accesslable})
-            except:
-                messages.error(request,'Registration Unsuccessful')
-                logger.error("An error occurred while adding the candidate.")
-                return render (request,'candidate_reg.html',{"form":form,'username':username,'accesslable':accesslable})
+        if request.method == "POST":
+            form = candidateform(request.POST, request.FILES)
+            if form.is_valid():
+                details = form.save(commit=False)
+                d = form.cleaned_data
+                exp = form.cleaned_data.get('experience')
+                today = datetime.today()
+                expdate = datetime(today.year - exp, today.month, today.day)
+                details.date = expdate
+                details.save()
+                form.save_m2m()
+                messages.success(request, 'Registration Successful')
+                logger.info("adding candidate %s", d)
+                form = candidateform()
+                return render(request, 'candidate_reg.html', {"form": form, 'username': username, 'accesslable': accesslable})
+            else:
+                messages.error(request, 'Form validation failed, please check your inputs and try again.')
+                logger.error("An error occurred while adding the candidate. Form validation failed.")
+                return render(request, 'candidate_reg.html', {"form": form, 'username': username, 'accesslable': accesslable})
 
         else:
-            form=candidateform(request.POST)
-        return render (request,'candidate_reg.html',{"form":form,'username':username,'accesslable':accesslable}) 
-    except:
-        logger.error("An error occurred while adding the candidate.")
+            form = candidateform()
+        return render(request, 'candidate_reg.html', {"form": form, 'username': username, 'accesslable': accesslable})
+    except Exception as e:
+        logger.error("An error occurred while adding the candidate: %s", str(e))
+        messages.error(request, 'Registration Unsuccessful')
+        return render(request, 'candidate_reg.html', {"form": form, 'username': username, 'accesslable': accesslable})
+
+
 
 
 #-----------------method for Adding Employees-------------------------------------
