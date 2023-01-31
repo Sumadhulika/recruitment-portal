@@ -41,27 +41,46 @@
 		
 		<script>
 			$(document).ready(function() {
-				$('#my_table').DataTable({
-					"processing": true,
-					"serverSide": false,
-					"ajax": {
-						"url": "{% url 'dataJson' %}",
-						"dataSrc":"data",
-						},
-						"columns": [
-							{"data": "first_name"},
-							{"data": "last_name"},
-							{"data": "email"},
-							{"data": "qualifications_id"},
-							{"data":"skills"},
-							{"data":"experience"},
-							{"data":"contact"},
-							{"data":"address"},
-						],
-						
+				var table = $('#my_table').DataTable({
+				  "processing": true,
+				  "serverSide": false,
+				  "ajax": {
+					"url": "{% url 'dataJson' %}",
+					"dataSrc":"data",
+				  },
+				  "columns": [
+					{"data": "first_name"},
+					{"data": "last_name"},
+					{"data": "email"},
+					{"data": "qualifications_id"},
+					{"data":"skills"},
+					{"data":"experience"},
+					{"data":"contact"},
+					{"data":"address"},
+				  ],
+				});
+			  
+				$('#my_table thead th').each( function () {
+				  var title = $('#my_table thead th').eq( $(this).index() ).text();
+				  if (title !== "contact" && title !== "address") {
+					$(this).html( '<span>' + title + '</span><br><input type="text" placeholder="Search '+title+'" />' );
+				  }
+				});
+			  
+				table.columns().eq(0).each( function ( colIdx ) {
+				  if (colIdx !== 6 && colIdx !== 7) {
+					$('input', table.column( colIdx ).header()).on( 'keyup change', function () {
+					  table
+						.column( colIdx )
+						.search( this.value )
+						.draw();
 					});
-					});
-		
+				  }
+				});
+			  });
+			  
+			  
+			  
 		</script>
 	</body>
 </html>
