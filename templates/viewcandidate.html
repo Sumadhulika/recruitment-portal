@@ -59,25 +59,33 @@
 					{"data":"address"},
 				  ],
 				});
-			  
+				
+				// Create a new table row to hold the search inputs
+				var searchRow = $("<tr></tr>");
+				$("#my_table thead").append(searchRow);
+				
+				// Loop through the columns and add a search input for each column
 				$('#my_table thead th').each( function () {
 				  var title = $('#my_table thead th').eq( $(this).index() ).text();
-				  if (title !== "contact" && title !== "address") {
-					$(this).html( '<span>' + title + '</span><br><input type="text" placeholder="Search '+title+'" />' );
-				  }
-				});
-			  
-				table.columns().eq(0).each( function ( colIdx ) {
-				  if (colIdx !== 6 && colIdx !== 7) {
-					$('input', table.column( colIdx ).header()).on( 'keyup change', function () {
+				  if (title !== "contact" && title !== "address") {  // exclude the "contact" and "address" columns
+					var searchInput = $('<input type="text" placeholder="Search '+title+'" />');
+				
+					// Add the input to the search row
+					var searchTd = $("<td></td>").append(searchInput);
+					searchRow.append(searchTd);
+				
+					// Add an event listener to the input to trigger a search and redraw the table
+					searchInput.on('keyup change', function () {
 					  table
-						.column( colIdx )
-						.search( this.value )
+						.column($(this).parent().index())
+						.search(this.value)
 						.draw();
 					});
 				  }
 				});
 			  });
+			  
+			  
 			  
 			  
 			  

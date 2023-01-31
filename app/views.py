@@ -66,6 +66,39 @@ def my_login(request):
 
 #-----------------method for Adding candidates------------------------------------
 
+# def candidate_registration(request):
+#     username = request.session.get('username')
+#     accesslable = request.session.get('accesslable')
+#     logger.info("Adding candidates")
+#     try:
+#         if request.method == "POST":
+#             form = candidateform(request.POST, request.FILES)
+#             if form.is_valid():
+#                 details = form.save(commit=False)
+#                 d = form.cleaned_data
+#                 exp = form.cleaned_data.get('experience')
+#                 today = datetime.today()
+#                 expdate = datetime(today.year - exp, today.month, today.day)
+#                 details.date = expdate
+#                 details.save()
+#                 form.save_m2m()
+#                 messages.success(request, 'Registration Successful')
+#                 logger.info("adding candidate %s", d)
+#                 form = candidateform()
+#                 return render(request, 'candidate_reg.html', {"form": form, 'username': username, 'accesslable': accesslable})
+#             else:
+#                 form.save()
+#                 messages.warning(request, 'Form validation failed, but the form was still saved.')
+#                 logger.warning("An error occurred while adding the candidate. Form validation failed, but the form was still saved.")
+#                 return render(request, 'candidate_reg.html', {"form": form, 'username': username, 'accesslable': accesslable})
+
+#         else:
+#             form = candidateform()
+#         return render(request, 'candidate_reg.html', {"form": form, 'username': username, 'accesslable': accesslable})
+#     except Exception as e:
+#         logger.error("An error occurred while adding the candidate: %s", str(e))
+#         messages.error(request, 'Registration Unsuccessful')
+#         return render(request, 'candidate_reg.html', {"form": form, 'username': username, 'accesslable': accesslable})
 def candidate_registration(request):
     username = request.session.get('username')
     accesslable = request.session.get('accesslable')
@@ -75,7 +108,6 @@ def candidate_registration(request):
             form = candidateform(request.POST, request.FILES)
             if form.is_valid():
                 details = form.save(commit=False)
-                d = form.cleaned_data
                 exp = form.cleaned_data.get('experience')
                 today = datetime.today()
                 expdate = datetime(today.year - exp, today.month, today.day)
@@ -83,12 +115,13 @@ def candidate_registration(request):
                 details.save()
                 form.save_m2m()
                 messages.success(request, 'Registration Successful')
-                logger.info("adding candidate %s", d)
+                logger.info("Candidate %s added successfully", details)
                 form = candidateform()
                 return render(request, 'candidate_reg.html', {"form": form, 'username': username, 'accesslable': accesslable})
             else:
-                messages.error(request, 'Form validation failed, please check your inputs and try again.')
-                logger.error("An error occurred while adding the candidate. Form validation failed.")
+                messages.warning(request, 'Form validation failed. Please check the errors in the form and try again.')
+                logger.warning("An error occurred while adding the candidate. Form validation failed. %s", form.errors)
+                print(form.errors)
                 return render(request, 'candidate_reg.html', {"form": form, 'username': username, 'accesslable': accesslable})
 
         else:
@@ -97,7 +130,9 @@ def candidate_registration(request):
     except Exception as e:
         logger.error("An error occurred while adding the candidate: %s", str(e))
         messages.error(request, 'Registration Unsuccessful')
-        return render(request, 'candidate_reg.html', {"form": form, 'username': username, 'accesslable': accesslable})
+        return render(request, 'candidate_reg.html', {"form": form, 'username': username, 'accesslable': accesslable}) 
+
+
 
 
 
